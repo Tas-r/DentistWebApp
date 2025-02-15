@@ -8,3 +8,4 @@ router.register(r'patients', PatientProfileViewSet)
 urlpatterns = [
     path('', include(router.urls)),
 ]
+
