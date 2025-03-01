@@ -19,10 +19,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse # added to test api endpoint
 from django.http import HttpResponse
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
  ) # added for the login page
+from appointments.views import AppointmentViewSet, DentistViewSet # added for the appointments function
 
 
 def test_api(request):
@@ -31,11 +34,18 @@ def test_api(request):
 def home_view(request):
     return HttpResponse("homepage dot html") 
 
+# start appointment stuff
+router = DefaultRouter()
+router.register(r"appointments", AppointmentViewSet)
+router.register(r"dentists", DentistViewSet)
+# end appointment stuff
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('users.urls')),
     path('api/', include('billing.urls')),
     path('api/', include('appointments.urls')), 
+    path("api/", include(router.urls)), # appointment thing
     
     # start stuff i'm adding in to make the frontend
     path('api/test/', test_api), # added to test api endpoint

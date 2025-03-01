@@ -11,17 +11,21 @@ function Login() {
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
-            const response = await axios.post("http://127.0.0.1:8000/api/login/", {
+            const response = await axios.post("http://127.0.0.1:8000/api/token/", {
                 username,
                 password,
             });
-            localStorage.setItem("token", response.data.access); // store token
+            console.log("login successful, tokens received:", response.data);
+            localStorage.setItem("access", response.data.access);
+            localStorage.setItem("refresh", response.data.refresh);
             alert("login successful!");
-            navigate("/portal"); // redirect to portal after login
+            navigate("/portal");
         } catch (err) {
+            console.error("login error:", err.response ? err.response.data : err);
             setError("invalid username or password");
         }
     };
+    
 
     return (
         <div>
