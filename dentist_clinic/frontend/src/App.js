@@ -1,12 +1,16 @@
 import React from "react";
-import Login from "./login";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./Login";
+import Portal from "./Portal";  // ✅ make sure this matches `Portal.js`
 
 function App() {
     return (
-        <div>
-            <h1>welcome to dentist clinic</h1>
-            <Login />
-        </div>
+        <Router>
+            <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="/portal" element={<Portal />} />
+            </Routes>
+        </Router>
     );
 }
 

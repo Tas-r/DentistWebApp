@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; // import useNavigate for redirection
 
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
+    const navigate = useNavigate(); // get the navigate function
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -15,6 +17,7 @@ function Login() {
             });
             localStorage.setItem("token", response.data.access); // store token
             alert("login successful!");
+            navigate("/portal"); // redirect to portal after login
         } catch (err) {
             setError("invalid username or password");
         }
