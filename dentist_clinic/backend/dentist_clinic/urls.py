@@ -19,6 +19,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse # added to test api endpoint
 from django.http import HttpResponse
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+ ) # added for the login page
 
 
 def test_api(request):
@@ -32,8 +36,13 @@ urlpatterns = [
     path('api/', include('users.urls')),
     path('api/', include('billing.urls')),
     path('api/', include('appointments.urls')), 
+    
+    # start stuff i'm adding in to make the frontend
     path('api/test/', test_api), # added to test api endpoint
     path('', home_view), # i dont like the weird page
-
+    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'), # login api
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), 
+    # end stuff i'm adding in to make the frontend
 ]
 
