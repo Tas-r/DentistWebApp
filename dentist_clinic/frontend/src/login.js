@@ -1,47 +1,99 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // import useNavigate for redirection
+import { useNavigate } from "react-router-dom";
+import "./Login.css"; // Import CSS for styling
+import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // Updated username icon
 
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState(null);
-    const navigate = useNavigate(); // get the navigate function
+    const navigate = useNavigate();
 
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
             const response = await axios.post("http://127.0.0.1:8000/api/token/", {
-                username,
+                username, // Updated to use "username" instead of "email"
                 password,
             });
-            console.log("login successful, tokens received:", response.data);
+
+            console.log("Login successful:", response.data);
             localStorage.setItem("access", response.data.access);
             localStorage.setItem("refresh", response.data.refresh);
-            alert("login successful!");
-            navigate("/portal");
+
+            // the oft imagined soft fade into the next page my beloved
+            document.body.classList.add("fade-out");
+            setTimeout(() => {
+                navigate("/dashboard");
+                document.body.classList.remove("fade-out");
+            }, 500);
+
         } catch (err) {
-            console.error("login error:", err.response ? err.response.data : err);
-            setError("invalid username or password");
+            console.error("Login error:", err.response ? err.response.data : err);
+            setError("Invalid username or password");
         }
     };
-    
 
     return (
-        <div>
-            <h2>login</h2>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <label>username:</label>
-                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+        <div className="login-container">
+            {/* Left Side - White Background with Centered Login Form */}
+            <div className="login-left">
+                <div className="login-form">
+                    <h2>Log in to your Account</h2>
+                    <p>Welcome back!</p>
+                    
+                    {error && <p className="error-message">{error}</p>}
+
+                    <form onSubmit={handleLogin}>
+                        {/* Username Input */}
+                        <div className="input-group">
+                            <FaUser className="icon" /> {/* Changed from FaEnvelope to FaUser */}
+                            <input
+                                type="text"
+                                placeholder="Username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        {/* Password Input */}
+                        <div className="input-group">
+                            <FaLock className="icon" />
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                            <button
+                                type="button"
+                                className="toggle-password"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        </div>
+
+                        {/* Remember Me & Forgot Password */}
+                        <div className="options">
+                            <label>
+                                <input type="checkbox" /> Remember me
+                            </label>
+                            <a href="/forgot-password">Forgot Password?</a>
+                        </div>
+
+                        {/* Login Button */}
+                        <button type="submit" className="login-button">Log in</button>
+                    </form>
                 </div>
-                <div>
-                    <label>password:</label>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </div>
-                <button type="submit">login</button>
-            </form>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            </div>
+
+            {/* Right Side - Grey Background or Image */}
+            <div className="login-right"></div>
         </div>
     );
 }

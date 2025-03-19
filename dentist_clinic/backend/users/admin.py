@@ -12,10 +12,12 @@ class CustomUserAdmin(UserAdmin):
         ('Roles & Permissions', {'fields': ('role', 'is_active', 'is_staff', 'groups', 'user_permissions')}),
         ('Important Dates', {'fields': ('last_login', 'date_joined')}),
     )
+
+# VI CHANGE: ADDED user_firstName and user_lastName
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('user_id', 'username', 'email', 'role', 'password1', 'password2', 'is_active', 'is_staff')}
+            'fields': ('user_firstName', 'user_lastName','user_id', 'username', 'email', 'role', 'password1', 'password2', 'is_active', 'is_staff')}
         ),
     )
     search_fields = ('username', 'email', 'role')

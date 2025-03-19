@@ -14,6 +14,14 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     user_id = models.CharField(max_length=20, unique=True)
 
+# VI CHANGE
+    user_firstName = models.CharField(max_length=50, null=True, blank=True)
+    user_lastName = models.CharField(max_length=50, null=True, blank=True) 
+
+    USERNAME_FIELD = 'username' 
+    REQUIRED_FIELDS = ['user_id'] 
+# END VI CHANGE
+
     # Fix related_name conflicts
     groups = models.ManyToManyField(
         "auth.Group",

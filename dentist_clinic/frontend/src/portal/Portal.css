@@ -1,0 +1,126 @@
+/* Smooth Fade Transition */
+body {
+    transition: opacity 0.5s ease-in-out;
+}
+body.fade-out {
+    opacity: 0;
+}
+
+/* Global Page Layout */
+.page-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Lato', sans-serif;
+    background-color: #F4F3EF; /* Off-White */
+}
+
+/* Main Dashboard and Content Areas */
+.dashboard-content, .content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+/* Page Title */
+.page-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: left; /* Left align the title */
+    max-width: 1200px; /* Matches the grid's max width */
+    margin-left: auto; /* Aligns the title with the grid */
+    margin-right: auto;
+}
+
+
+/* Unified Grid Layout for Dashboard and Appointments */
+.dashboard-sections, .doctor-selection, .availability-grid, .reason-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    align-items: stretch; /* match tile heights */
+    max-width: 1200px; /* caps width at roughly 3 columns */
+    margin: 0 auto; /* centers the entire grid */
+}
+
+/* Cards Styling */
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* vertical centering */
+    justify-content: center;
+    background: #E0DFDB; /* Light Grey */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Appointment Details (Dashboard) */
+.appointment-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Quick Actions (Dashboard) */
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+.action img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 8px;
+}
+
+/* Profile Pictures */
+.profile-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+/* Links */
+.link {
+    display: block;
+    color: #627761;
+    font-weight: bold;
+    text-decoration: none;
+    margin-top: 10px;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+/* Buttons (only microinteraction allowed) */
+button, .confirm-button {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+button:hover, .confirm-button:hover {
+    transform: scale(1.05);
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .dashboard-content, .content {
+        padding: 20px;
+    }
+
+    .page-title {
+        font-size: 26px;
+    }
+
+    .dashboard-sections, .doctor-selection, .availability-grid, .reason-list {
+        grid-template-columns: 1fr;
+    }
+}
