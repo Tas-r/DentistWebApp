@@ -1,0 +1,5 @@
+http://localhost:8000/users/login/
+{
+    "username": "patient",
+    "password": "test4321"
+}
