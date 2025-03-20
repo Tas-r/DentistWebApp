@@ -1,112 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Nunito:wght@700&display=swap');
-
-body, html {
-    font-family: 'Lato', sans-serif;
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3 {
-    font-family: 'Nunito', sans-serif;
-}
-
-.login-container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-}
-
-.login-form {
-    width: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center; /* Fully centers the form */
-    background: white;
-}
-
-.login-content {
-    width: 100%;
-    max-width: 350px; /* Limits the form width */
-}
-
-.login-form h2 {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.login-form p {
-    margin-bottom: 20px;
-    color: #666;
-}
-
-.input-group {
-    display: flex;
-    align-items: center;
-    background: #f5f5f5;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    width: 100%;
-}
-
-.input-group .icon {
-    margin-right: 10px;
-    color: #666;
-}
-
-.input-group input {
-    border: none;
-    background: transparent;
-    width: 100%;
-    outline: none;
-    font-size: 1rem;
-}
-
-.options {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    font-size: 0.9rem;
-    margin-bottom: 20px;
-}
-
-.options a {
-    color: #666;
-    text-decoration: none;
-}
-
-.options a:hover {
-    text-decoration: underline;
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    background: black;
-    color: white;
-    font-size: 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: 'Lato', sans-serif;
-}
-
-button:hover {
-    opacity: 0.8;
-}
-
-.error {
-    color: red;
-    margin-top: 10px;
-}
-
-.login-background {
-    width: 50%;
-    background: #333;
-    height: 100vh;
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
 }
