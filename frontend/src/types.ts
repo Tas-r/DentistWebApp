@@ -34,3 +34,18 @@ export interface Appointment {
   created_at: string;
   updated_at: string;
 }
+
+// types.ts
+
+
+export interface Patient {
+  id: number;
+  user: { username: string; id: number };
+  // Add other fields as needed
+}
+
+export interface Dentist {
+  id: number;
+  user: { username: string; id: number };
+  // Add other fields as needed
+}

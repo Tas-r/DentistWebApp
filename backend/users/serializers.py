@@ -183,3 +183,6 @@ class DentistSerializer(serializers.ModelSerializer):
         
         instance.save()
         return instance
+    
+
+    

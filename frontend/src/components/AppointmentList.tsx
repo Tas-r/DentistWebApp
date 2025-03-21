@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { getAppointments, getUpcomingAppointments, deleteAppointment } from '../api';
-import { Appointment } from '../types';
-import { Calendar, Clock, Trash2, RefreshCw } from 'lucide-react';
+import { getAppointments, getUpcomingAppointments, deleteAppointment, createAppointment, getPatients, getDentists } from '../api';
+import { Appointment, Patient, Dentist } from '../types';
+import { Calendar, Clock, Trash2, RefreshCw, Plus } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 export default function AppointmentList() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showUpcoming, setShowUpcoming] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [dentists, setDentists] = useState<Dentist[]>([]);
+  const [formData, setFormData] = useState({
+    patient_id: '',
+    dentist_id: '',
+    appointment_date: '',
+    service: '',
+  });
 
   const fetchAppointments = async (upcoming: boolean) => {
     try {
@@ -22,8 +31,27 @@ export default function AppointmentList() {
     }
   };
 
+// AppointmentList.tsx (partial update)
+const fetchDropdownData = async () => {
+  try {
+    const [patientsData, dentistsData] = await Promise.all([getPatients(), getDentists()]);
+    setPatients(patientsData);
+    setDentists(dentistsData);
+  } catch (error) {
+    console.error('Error fetching dropdown data:', error);
+    toast.error('Please log in to view patients and dentists');
+    // Optionally redirect to login page
+  }
+};
+
+useEffect(() => {
+  fetchAppointments(showUpcoming);
+  fetchDropdownData();
+}, [showUpcoming]);
+
   useEffect(() => {
     fetchAppointments(showUpcoming);
+    fetchDropdownData();
   }, [showUpcoming]);
 
   const handleDelete = async (id: number) => {
@@ -33,6 +61,25 @@ export default function AppointmentList() {
       fetchAppointments(showUpcoming);
     } catch (error) {
       toast.error('Failed to delete appointment');
+    }
+  };
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await createAppointment({
+        ...(formData.patient_id && { patient_id: Number(formData.patient_id) }),
+        ...(formData.dentist_id && { dentist_id: Number(formData.dentist_id) }),
+        appointment_date: formData.appointment_date,
+        service: formData.service,
+      });
+      toast.success('Appointment created successfully');
+      setFormData({ patient_id: '', dentist_id: '', appointment_date: '', service: '' });
+      setShowForm(false);
+      fetchAppointments(showUpcoming);
+    } catch (error) {
+      toast.error('Failed to create appointment');
+      console.error('Error creating appointment:', error);
     }
   };
 
@@ -67,8 +114,78 @@ export default function AppointmentList() {
             <RefreshCw className="h-4 w-4" />
             {showUpcoming ? 'Show All' : 'Show Upcoming'}
           </button>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            {showForm ? 'Cancel' : 'New Appointment'}
+          </button>
         </div>
       </div>
+
+      {showForm && (
+        <form onSubmit={handleCreate} className="mb-8 bg-white p-6 rounded-lg shadow-md">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Patient</label>
+              <select
+                value={formData.patient_id}
+                onChange={(e) => setFormData({ ...formData, patient_id: e.target.value })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              >
+                <option value="">Select Patient</option>
+                {patients.map((patient) => (
+                  <option key={patient.id} value={patient.id}>
+                    {patient.user.username}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Dentist</label>
+              <select
+                value={formData.dentist_id}
+                onChange={(e) => setFormData({ ...formData, dentist_id: e.target.value })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              >
+                <option value="">Select Dentist</option>
+                {dentists.map((dentist) => (
+                  <option key={dentist.id} value={dentist.id}>
+                    Dr. {dentist.user.username}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Date & Time</label>
+              <input
+                type="datetime-local"
+                value={formData.appointment_date}
+                onChange={(e) => setFormData({ ...formData, appointment_date: e.target.value })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Service</label>
+              <input
+                type="text"
+                value={formData.service}
+                onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                required
+              />
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Create Appointment
+          </button>
+        </form>
+      )}
 
       {appointments.length === 0 ? (
         <div className="text-center py-12">

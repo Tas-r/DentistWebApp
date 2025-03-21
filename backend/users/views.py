@@ -66,12 +66,7 @@ class DentistViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
-        if user.is_staff:
-            return Dentist.objects.all()
-        elif user.user_type == 'dentist':
-            return Dentist.objects.filter(user=user)
-        return Dentist.objects.none()
+        return Dentist.objects.all()
 
 # Staff ViewSet (Added for completeness)
 class StaffViewSet(viewsets.ModelViewSet):

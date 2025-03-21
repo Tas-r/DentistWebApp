@@ -105,6 +105,21 @@ export const createAppointment = async (data: {
   return response.data;
 };
 
+// Assuming you might need these for dropdowns
+export const getPatients = async () => {
+  const response = await axios.get('http://localhost:8000/users/patients/', {
+    headers: { Authorization: `Bearer ${localStorage.getItem('access')}` },
+  });
+  return response.data;
+};
+
+export const getDentists = async () => {
+  const response = await axios.get('http://localhost:8000/users/dentists/', {
+    headers: { Authorization: `Bearer ${localStorage.getItem('access')}` },
+  });
+  return response.data;
+};
+
 export const updateAppointment = async (
   id: number,
   data: Partial<Appointment>
