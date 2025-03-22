@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'corsheaders',  # Add this for CORS support
     'users',  # User management app
     'appointments',  # Appointment app (optional)
+    'messaging',  # Messaging app (optional)
     'billing',  # Billing app (optional)
 ]
 
