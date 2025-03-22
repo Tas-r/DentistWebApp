@@ -26,5 +26,5 @@ urlpatterns = [
     path('messaging/', include('messaging.urls')),
    
 
-]
+]    
 
