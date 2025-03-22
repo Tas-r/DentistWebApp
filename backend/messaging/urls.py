@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     # List messages or send a new one
-    path('listcreate', views.MessageListCreateView.as_view(), name='message-list-create'),
+    path('list_create/', views.MessageListCreateView.as_view(), name='message-list-create'),
     
     # View, update, or delete a specific message
     path('<int:pk>/view_update_delete/', views.MessageDetailView.as_view(), name='message-detail'),
