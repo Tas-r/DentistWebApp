@@ -23,9 +23,8 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('', include('billing.urls')),  # 
     path('appointments/', include('appointments.urls')), 
-    path('api/messaging/', include('messaging.urls')),
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('messaging/', include('messaging.urls')),
+   
 
 ]
 

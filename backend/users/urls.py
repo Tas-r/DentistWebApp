@@ -13,6 +13,6 @@ router.register(r'staff', StaffViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('signup/', SignupView.as_view(), name='signup'),
-   path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # JWT Login
+    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # JWT Login
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  # Refresh Token
 ]

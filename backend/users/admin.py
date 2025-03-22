@@ -5,7 +5,7 @@ from .models import User, Patient, Dentist, Staff
 
 class UserAdmin(BaseUserAdmin):
     # Fields to display in the list view
-    list_display = ('username', 'email', 'user_type', 'phone_number', 'is_staff', 'is_active')
+    list_display = ('id','username', 'email', 'user_type', 'phone_number', 'is_staff', 'is_active')
     # Fields to filter by in the sidebar
     list_filter = ('user_type', 'is_staff', 'is_active', 'is_superuser')
     # Fields to search

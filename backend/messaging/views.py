@@ -21,10 +21,10 @@ class MessageListCreateView(generics.ListCreateAPIView):
         user = self.request.user
         if user.user_type == 'staff':
             # Staff can see all messages
-            return Message.objects.all()
+            return Messaging.objects.all()
         else:
             # Regular users see their sent or received messages
-            return Message.objects.filter(
+            return Messaging.objects.filter(
                 Q(sender=user) | Q(recipient=user)
             )
 
@@ -41,9 +41,9 @@ class MessageDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         user = self.request.user
         if user.user_type == 'staff':
-            return Message.objects.all()
+            return Messaging.objects.all()
         else:
-            return Message.objects.filter(
+            return Messaging.objects.filter(
                 Q(sender=user) | Q(recipient=user)
             )
 
@@ -59,7 +59,7 @@ class ReplyMessageView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        parent_message = Message.objects.get(id=self.kwargs['pk'])
+        parent_message = Messaging.objects.get(id=self.kwargs['pk'])
         serializer.save(
             sender=self.request.user,
             recipient=parent_message.sender,  # Reply goes to original sender
@@ -75,9 +75,9 @@ class InboxView(APIView):
     def get(self, request):
         user = request.user
         if user.user_type == 'staff':
-            messages = Message.objects.filter(is_read=False)
+            messages = Messaging.objects.filter(is_read=False)
         else:
-            messages = Message.objects.filter(recipient=user, is_read=False)
+            messages = Messaging.objects.filter(recipient=user, is_read=False)
         
         serializer = MessageSerializer(messages, many=True)
         return Response(serializer.data)
