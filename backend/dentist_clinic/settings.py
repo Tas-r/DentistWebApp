@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'appointments',  # Appointment app (optional)
     'messaging',  # Messaging app (optional)
     'billing',  # Billing app (optional)
+    'notifications',  # Notifications app (optional)
 ]
 
 MIDDLEWARE = [

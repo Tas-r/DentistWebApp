@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Appointment, Service
+from .models import Appointment, Services
 from users.models import Patient, Dentist
 from django.contrib.auth import get_user_model
 
@@ -30,16 +30,16 @@ class DentistSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'specialization', 'license_number', 'years_of_experience']
 
 # Service Serializer
-class ServiceSerializer(serializers.ModelSerializer):
+class ServicesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Service
+        model = Services
         fields = ['id', 'name']
 
 # Appointment Serializer
 class AppointmentSerializer(serializers.ModelSerializer):
     patient = PatientSerializer(read_only=True)
     dentist = DentistSerializer(read_only=True)
-    services = ServiceSerializer(many=True, read_only=True)
+    services = ServicesSerializer(many=True, read_only=True)
     patient_id = serializers.PrimaryKeyRelatedField(
         queryset=Patient.objects.all(),
         source='patient',
@@ -51,7 +51,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
         write_only=True
     )
     service_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Service.objects.all(),
+        queryset=Services.objects.all(),
         source='services',
         many=True,
         write_only=True

@@ -2,14 +2,14 @@ from rest_framework import generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils import timezone
-from .models import Appointment, Service
-from .serializers import AppointmentSerializer, ServiceSerializer
+from .models import Appointment, Services
+from .serializers import AppointmentSerializer, ServicesSerializer
 from users.models import Patient, Dentist
 
 # Service List View (to display available services in the frontend)
 class ServiceListView(generics.ListAPIView):
-    queryset = Service.objects.all()
-    serializer_class = ServiceSerializer
+    queryset = Services.objects.all()
+    serializer_class = ServicesSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 # Appointment List/Create View

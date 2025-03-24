@@ -1,9 +1,16 @@
 from django.contrib import admin
-from .models import Appointment
+from .models import Appointment, Services
 
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
-    list_display = ('patient', 'dentist', 'appointment_date', 'service', 'created_at')
-    list_filter = ('appointment_date', 'dentist', 'patient')
-    search_fields = ('patient__user__username', 'dentist__user__username', 'service')
-    ordering = ('appointment_date',)
+    list_display = ['patient', 'dentist', 'appointment_date', 'get_services']  # Use a custom method
+
+    def get_services(self, obj):
+        # Join the names of all related services into a single string
+        return ", ".join(service.name for service in obj.services.all())
+    
+    get_services.short_description = "Services"  # Display name in admin
+
+@admin.register(Services)
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ['name']
