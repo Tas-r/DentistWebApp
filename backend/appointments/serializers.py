@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from .models import Appointment
-from users.models import Patient, Dentist  # Updated to match your models
+from .models import Appointment, Service
+from users.models import Patient, Dentist
 from django.contrib.auth import get_user_model
 
-User = get_user_model()  # Should resolve to your User model
+User = get_user_model()
 
 # User Serializer (Base for Patient and Dentist)
 class UserSerializer(serializers.ModelSerializer):
@@ -29,10 +29,17 @@ class DentistSerializer(serializers.ModelSerializer):
         model = Dentist
         fields = ['id', 'username', 'specialization', 'license_number', 'years_of_experience']
 
+# Service Serializer
+class ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = ['id', 'name']
+
 # Appointment Serializer
 class AppointmentSerializer(serializers.ModelSerializer):
     patient = PatientSerializer(read_only=True)
     dentist = DentistSerializer(read_only=True)
+    services = ServiceSerializer(many=True, read_only=True)
     patient_id = serializers.PrimaryKeyRelatedField(
         queryset=Patient.objects.all(),
         source='patient',
@@ -43,21 +50,32 @@ class AppointmentSerializer(serializers.ModelSerializer):
         source='dentist',
         write_only=True
     )
+    service_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Service.objects.all(),
+        source='services',
+        many=True,
+        write_only=True
+    )
     appointment_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
 
     class Meta:
         model = Appointment
         fields = ['id', 'patient', 'dentist', 'patient_id', 'dentist_id',
-                  'appointment_date', 'service', 'created_at', 'updated_at']
+                  'appointment_date', 'services', 'service_ids', 'created_at', 'updated_at']
         read_only_fields = ['created_at', 'updated_at']
 
     def create(self, validated_data):
-        return Appointment.objects.create(**validated_data)
+        services = validated_data.pop('services', [])
+        appointment = Appointment.objects.create(**validated_data)
+        appointment.services.set(services)  # Set the many-to-many relationship
+        return appointment
 
     def update(self, instance, validated_data):
+        services = validated_data.pop('services', None)
         instance.patient = validated_data.get('patient', instance.patient)
         instance.dentist = validated_data.get('dentist', instance.dentist)
         instance.appointment_date = validated_data.get('appointment_date', instance.appointment_date)
-        instance.service = validated_data.get('service', instance.service)
+        if services is not None:
+            instance.services.set(services)
         instance.save()
         return instance

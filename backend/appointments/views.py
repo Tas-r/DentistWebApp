@@ -2,24 +2,22 @@ from rest_framework import generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils import timezone
-from .models import Appointment
-from .serializers import AppointmentSerializer
+from .models import Appointment, Service
+from .serializers import AppointmentSerializer, ServiceSerializer
 from users.models import Patient, Dentist
 
+# Service List View (to display available services in the frontend)
+class ServiceListView(generics.ListAPIView):
+    queryset = Service.objects.all()
+    serializer_class = ServiceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+# Appointment List/Create View
 class AppointmentListCreateView(generics.ListCreateAPIView):
-    """
-    List all appointments or create a new appointment based on user type.
-    """
     serializer_class = AppointmentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        """
-        Filter appointments based on user type:
-        - Patients see their own appointments.
-        - Dentists see their own appointments.
-        - Staff see all appointments.
-        """
         user = self.request.user
         if user.user_type == 'patient':
             return Appointment.objects.filter(patient__user=user)
@@ -30,12 +28,6 @@ class AppointmentListCreateView(generics.ListCreateAPIView):
         return Appointment.objects.none()
 
     def perform_create(self, serializer):
-        """
-        Automatically set patient or dentist based on user type:
-        - Patients set themselves as the patient.
-        - Dentists set themselves as the dentist.
-        - Staff can specify both via patient_id and dentist_id.
-        """
         user = self.request.user
         if user.user_type == 'patient':
             serializer.save(patient=user.patient_profile)
@@ -44,20 +36,12 @@ class AppointmentListCreateView(generics.ListCreateAPIView):
         else:  # Staff can create with full control
             serializer.save()
 
+# Appointment Detail View
 class AppointmentDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    Retrieve, update, or delete a specific appointment.
-    """
     serializer_class = AppointmentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        """
-        Restrict access based on user type:
-        - Patients can only access their own appointments.
-        - Dentists can only access their own appointments.
-        - Staff can access all appointments.
-        """
         user = self.request.user
         if user.user_type == 'patient':
             return Appointment.objects.filter(patient__user=user)
@@ -67,16 +51,11 @@ class AppointmentDetailView(generics.RetrieveUpdateDestroyAPIView):
             return Appointment.objects.all()
         return Appointment.objects.none()
 
+# Upcoming Appointments View
 class UpcomingAppointmentsView(APIView):
-    """
-    List upcoming appointments for the authenticated user.
-    """
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        """
-        Return appointments from now onward based on user type.
-        """
         user = request.user
         now = timezone.now()
 
@@ -100,20 +79,12 @@ class UpcomingAppointmentsView(APIView):
         serializer = AppointmentSerializer(appointments, many=True)
         return Response(serializer.data)
 
+# My Appointments View
 class MyAppointmentsView(generics.ListAPIView):
-    """
-    List the authenticated user's appointments (read-only).
-    """
     serializer_class = AppointmentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        """
-        Filter appointments based on user type:
-        - Patients see their own appointments.
-        - Dentists see their own appointments.
-        - Staff see all appointments.
-        """
         user = self.request.user
         if user.user_type == 'patient':
             return Appointment.objects.filter(patient__user=user)
@@ -122,3 +93,50 @@ class MyAppointmentsView(generics.ListAPIView):
         elif user.user_type == 'staff':
             return Appointment.objects.all()
         return Appointment.objects.none()
+
+# Available Time Slots View (for a specific dentist and date)
+class AvailableTimeSlotsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        dentist_id = request.query_params.get('dentist_id')
+        date = request.query_params.get('date')  # Expected format: YYYY-MM-DD
+
+        if not dentist_id or not date:
+            return Response({"error": "dentist_id and date are required"}, status=400)
+
+        try:
+            dentist = Dentist.objects.get(id=dentist_id)
+        except Dentist.DoesNotExist:
+            return Response({"error": "Dentist not found"}, status=404)
+
+        # Parse the date
+        from datetime import datetime
+        try:
+            selected_date = datetime.strptime(date, '%Y-%m-%d')
+        except ValueError:
+            return Response({"error": "Invalid date format. Use YYYY-MM-DD"}, status=400)
+
+        # Define available time slots (e.g., 9:00 AM to 5:00 PM, 30-minute intervals)
+        from datetime import timedelta
+        start_time = selected_date.replace(hour=9, minute=0)
+        end_time = selected_date.replace(hour=17, minute=0)
+        time_slots = []
+        current_time = start_time
+        while current_time < end_time:
+            time_slots.append(current_time.strftime('%I:%M %p').lower())  # e.g., "9:00 am"
+            current_time += timedelta(minutes=30)
+
+        # Get booked time slots for the dentist on the selected date
+        booked_slots = Appointment.objects.filter(
+            dentist=dentist,
+            appointment_date__date=selected_date
+        ).values_list('appointment_date__time', flat=True)
+
+        # Convert booked slots to the same format
+        booked_times = [slot.strftime('%I:%M %p').lower() for slot in booked_slots]
+
+        # Filter out booked slots
+        available_slots = [slot for slot in time_slots if slot not in booked_times]
+
+        return Response({"available_slots": available_slots})
