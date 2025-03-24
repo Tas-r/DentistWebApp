@@ -5,12 +5,14 @@ from django.utils import timezone
 from .models import Appointment, Services
 from .serializers import AppointmentSerializer, ServicesSerializer
 from users.models import Patient, Dentist
+from notifications.models import Notification
 
 # Service List View (to display available services in the frontend)
 class ServiceListView(generics.ListAPIView):
     queryset = Services.objects.all()
     serializer_class = ServicesSerializer
     permission_classes = [permissions.IsAuthenticated]
+
 
 # Appointment List/Create View
 class AppointmentListCreateView(generics.ListCreateAPIView):
@@ -30,11 +32,21 @@ class AppointmentListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         user = self.request.user
         if user.user_type == 'patient':
-            serializer.save(patient=user.patient_profile)
+            appointment = serializer.save(patient=user.patient_profile)
         elif user.user_type == 'dentist':
-            serializer.save(dentist=user.dentist_profile)
+            appointment = serializer.save(dentist=user.dentist_profile)
         else:  # Staff can create with full control
-            serializer.save()
+            appointment = serializer.save()
+
+        # Create a notification for the patient
+        Notification.objects.create(
+            user=appointment.patient.user,
+            notification_type='appointment_reminder',
+            message=f"You have an upcoming appointment with Dr. {appointment.dentist.user.username} on {appointment.appointment_date.strftime('%Y-%m-%d %H:%M')}",
+            related_appointment=appointment
+        )
+
+    
 
 # Appointment Detail View
 class AppointmentDetailView(generics.RetrieveUpdateDestroyAPIView):
