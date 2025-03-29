@@ -98,8 +98,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days= 10),  # 24 hours
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=10),  # 30 days
+    'ACCESS_TOKEN_LIFETIME': timedelta(days= 10),  # 10
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=10),  # 10 days
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
     'UPDATE_LAST_LOGIN': True,
@@ -122,8 +122,12 @@ WSGI_APPLICATION = 'dentist_clinic.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dentist_clinic',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': 'localhost',  
+        'PORT': '3306',  # Default MySQL port
     }
 }
 
