@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'messaging',  # Messaging app (optional)
     'billing',  # Billing app (optional)
     'notifications',  # Notifications app (optional)
+    'medical_history',  # Medical history app
+    'documents',  # Document management app (optional)
 ]
 
 MIDDLEWARE = [
