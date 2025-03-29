@@ -1,80 +1,24 @@
-import { Routes, Route, Navigate } from "react-router-dom"
-import LandingPage from "./pages/LandingPage"
-import LoginPage from "./pages/LoginPage"
-import DashboardPage from "./pages/DashboardPage"
-import AppointmentsPage from "./pages/AppointmentsPage"
-import AppointmentDetailPage from "./pages/AppointmentDetailPage"
-import NewAppointmentPage from "./pages/NewAppointmentPage"
-import DocumentsPage from "./pages/DocumentsPage"
-import MessagesPage from "./pages/MessagesPage"
-import ProtectedRoute from "./components/ProtectedRoute"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Index from "./pages/Index";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
+    <Router>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/login" element={<Login />} />
 
-      {/* Protected routes */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/appointments"
-        element={
-          <ProtectedRoute>
-            <AppointmentsPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/appointments/:id"
-        element={
-          <ProtectedRoute>
-            <AppointmentDetailPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/appointments/new"
-        element={
-          <ProtectedRoute>
-            <NewAppointmentPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/documents"
-        element={
-          <ProtectedRoute>
-            <DocumentsPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/messages"
-        element={
-          <ProtectedRoute>
-            <MessagesPage />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Catch all route */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  )
+        {/* Protected route wrapper */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          {/* you can add more protected routes here */}
+        </Route>
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
-
+export default App;

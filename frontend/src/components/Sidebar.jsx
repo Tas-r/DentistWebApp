@@ -1,76 +1,109 @@
-"use client"
+import React, { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { 
+  FaHome, FaCalendarCheck, FaFileAlt, FaEnvelope, 
+  FaCog, FaLifeRing, FaUserCircle, FaSignOutAlt 
+} from "react-icons/fa";
+import "../styles/Sidebar.css";
 
-import { useState } from "react"
-import { Link, useLocation, useNavigate } from "react-router-dom"
+function Sidebar({ activePage }) {
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
-function Sidebar() {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const [isOpen, setIsOpen] = useState(false)
+  // Utility to decode JWT payload
+  const decodeJWT = (token) => {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return null;
+    }
+  };
 
+  useEffect(() => {
+    const token = localStorage.getItem("access");
+    if (token) {
+      const payload = decodeJWT(token);
+      if (payload) {
+        // Adjust these keys depending on what your token includes.
+        // For example, if your payload includes "username" and "email":
+        setUser(payload);
+      }
+    }
+  }, []);
+
+  // Handle Logout
   const handleLogout = () => {
-    // Clear token from localStorage
-    localStorage.removeItem("token")
-    // Redirect to landing page
-    navigate("/")
-  }
-
-  // Navigation items
-  const navItems = [
-    { name: "Dashboard", path: "/dashboard" },
-    { name: "Appointments", path: "/appointments" },
-    { name: "Documents", path: "/documents" },
-    { name: "Messages", path: "/messages" },
-  ]
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    navigate("/login");
+  };
 
   return (
-    <>
-      {/* Mobile menu button */}
-      <button className="md:hidden fixed top-4 left-4 z-20 p-2 bg-gray-200 rounded" onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? "Close" : "Menu"}
-      </button>
+    <div className="sidebar">
+      <ul className="menu">
+        <li>
+          <NavLink to="/dashboard" className={activePage === "dashboard" ? "active" : ""}>
+            <FaHome className="icon" /> Dashboard
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/appointments" className={activePage === "appointments" ? "active" : ""}>
+            <FaCalendarCheck className="icon" /> Appointments
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/documents" className={activePage === "documents" ? "active" : ""}>
+            <FaFileAlt className="icon" /> Documents
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/messages" className={activePage === "messages" ? "active" : ""}>
+            <FaEnvelope className="icon" /> Messages
+          </NavLink>
+        </li>
+      </ul>
 
-      {/* Sidebar */}
-      <div
-        className={`fixed inset-y-0 left-0 transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 transition duration-200 ease-in-out z-10 w-64 bg-gray-100 p-4 overflow-auto`}
-      >
-        <div className="flex flex-col h-full">
-          <div className="mb-8">
-            <h1 className="text-xl font-bold">Dental Clinic Portal</h1>
-          </div>
+      {/* Support & Settings Section */}
+      <ul className="bottom-menu">
+        <li>
+          <NavLink to="/support" className={activePage === "support" ? "active" : ""}>
+            <FaLifeRing className="icon" /> Support
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/settings" className={activePage === "settings" ? "active" : ""}>
+            <FaCog className="icon" /> Settings
+          </NavLink>
+        </li>
+      </ul>
 
-          <nav className="flex-grow">
-            <ul className="space-y-2">
-              {navItems.map((item) => (
-                <li key={item.path}>
-                  <Link
-                    to={item.path}
-                    className={`block p-2 rounded ${
-                      location.pathname === item.path ? "bg-blue-600 text-white" : "hover:bg-gray-200"
-                    }`}
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <div className="mt-auto pt-4">
-            <button
-              onClick={handleLogout}
-              className="w-full p-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-            >
-              Logout
-            </button>
+      {/* User Profile */}
+      {user && (
+        <div className="sidebar-profile">
+          <FaUserCircle className="profile-icon" />
+          <div className="profile-info">
+            {/* adjust these fields based on your token payload */}
+            <p className="profile-name">{`${user.user_firstName || user.username} ${user.user_lastName || ""}`}</p>
+            <p className="profile-email">{user.email}</p>
           </div>
         </div>
-      </div>
-    </>
-  )
+      )}
+
+      {/* Log Out Button */}
+      <button className="logout-button" onClick={handleLogout}>
+        <FaSignOutAlt className="icon" /> Log Out
+      </button>
+    </div>
+  );
 }
 
-export default Sidebar
-
+export default Sidebar;
