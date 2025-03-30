@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./Login.css"; // Import CSS for styling
+import "../styles/Login.css"; // Import CSS for styling
 import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // Updated username icon
 
 function Login() {
@@ -10,16 +10,19 @@ function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-
+  
     const handleLogin = async (event) => {
-        event.preventDefault();
-        try {
-            const response = await axios.post("http://127.0.0.1:8000/api/token/", {
-                username, // Updated to use "username" instead of "email"
-                password,
-            });
+      event.preventDefault();
+  
+      try {
+        const response = await axios.post(
+          "http://127.0.0.1:8000/api/login/",
+          { username, password },
+          { withCredentials: true }
+        );
 
             console.log("Login successful:", response.data);
+            // Store tokens
             localStorage.setItem("access", response.data.access);
             localStorage.setItem("refresh", response.data.refresh);
 
