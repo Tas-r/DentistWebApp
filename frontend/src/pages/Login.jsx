@@ -16,15 +16,16 @@ function Login() {
   
       try {
         const response = await axios.post(
-          "http://127.0.0.1:8000/api/login/",
+          "http://127.0.0.1:8000/users/login/",
           { username, password },
           { withCredentials: true }
         );
 
             console.log("Login successful:", response.data);
             // Store tokens
-            localStorage.setItem("access", response.data.access);
-            localStorage.setItem("refresh", response.data.refresh);
+            localStorage.setItem("access", response.data.access || response.data.access_token);
+            localStorage.setItem("refresh", response.data.refresh || response.data.refresh_token);
+
 
             // the oft imagined soft fade into the next page my beloved
             document.body.classList.add("fade-out");

@@ -3,6 +3,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
+import Appointments from "./pages/Appointments";
 
 function App() {
   return (
@@ -14,7 +15,9 @@ function App() {
         {/* Protected route wrapper */}
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          {/* you can add more protected routes here */}
+          <Route path="/appointments" element={<Appointments />} />
+          <Route path="/documents" element={<Document />} />
+          <Route path="/inbox" element={<Dashboard />} />
         </Route>
       </Routes>
     </Router>
