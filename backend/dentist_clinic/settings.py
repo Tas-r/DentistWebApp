@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users.apps.UsersConfig',
+    'documents.apps.DocumentsConfig',
     'rest_framework_simplejwt',
     'corsheaders',  # Add this for CORS support
     'users',  # User management app
