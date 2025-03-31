@@ -83,11 +83,4 @@ class Dentist(models.Model):
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} - {self.specialization}"
     
-class Documents(models.Model):
-    user = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='documents')
-    document_type = models.CharField(max_length=50)
-    document_file = models.FileField(upload_to='documents/')
-    upload_date = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return f"{self.user.username} - {self.document_type}"
+

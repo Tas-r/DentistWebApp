@@ -1,6 +1,7 @@
+# documents/models.py
 from django.db import models
 from django.core.validators import FileExtensionValidator
-from users.models import Patient  # Import Patient from users app
+from users.models import Patient
 
 class Documents(models.Model):
     user = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='documents')
@@ -10,6 +11,6 @@ class Documents(models.Model):
         validators=[FileExtensionValidator(allowed_extensions=['pdf'])]
     )
     upload_date = models.DateTimeField(auto_now_add=True)
-   
+    
     def __str__(self):
         return f"{self.user.user.username} - {self.description}"
