@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils import timezone
 from .models import Appointment, Services
-from .serializers import AppointmentSerializer, ServicesSerializer
+from .serializers import AppointmentSerializer, ServicesSerializer, SimpleDentistSerializer
 from users.models import Patient, Dentist
 from notifications.models import Notification
 
@@ -152,3 +152,12 @@ class AvailableTimeSlotsView(APIView):
         available_slots = [slot for slot in time_slots if slot not in booked_times]
 
         return Response({"available_slots": available_slots})
+    
+# Add the DentistListView (already created, just updated to use SimpleDentistSerializer)
+class DentistListView(generics.ListAPIView):
+    queryset = Dentist.objects.all()
+    serializer_class = SimpleDentistSerializer  # Use the new simplified serializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Dentist.objects.all()
