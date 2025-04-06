@@ -19,4 +19,7 @@ urlpatterns = [
     
     # Available time slots for a dentist on a specific date
     path('time-slots/', views.AvailableTimeSlotsView.as_view(), name='available-time-slots'),
+
+    # New path for fetching dentists
+    path('dentists/', views.DentistListView.as_view(), name='dentist-list'),
 ]

@@ -79,3 +79,12 @@ class AppointmentSerializer(serializers.ModelSerializer):
             instance.services.set(services)
         instance.save()
         return instance
+    
+    # Add the new simplified serializer for the dentist list
+class SimpleDentistSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source='user.first_name', read_only=True)
+    last_name = serializers.CharField(source='user.last_name', read_only=True)
+
+    class Meta:
+        model = Dentist
+        fields = ['id', 'first_name', 'last_name']
