@@ -1,8 +1,67 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
-import "../styles/Portal.css"; // Global styling
+import axios from "axios";
+import "../styles/Portal.css";
 
 function Dashboard() {
+    const [appointment, setAppointment] = useState(null);
+    const [notifications, setNotifications] = useState([]);
+    const [dentists, setDentists] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const token = localStorage.getItem("access");
+            if (!token) return;
+
+            const headers = { Authorization: `Bearer ${token}` };
+
+            try {
+                const appRes = await axios.get("http://127.0.0.1:8000/appointments/upcoming/", { headers });
+                setAppointment(appRes.data[0] || null);
+            } catch (err) {
+                console.error("❌ Failed to fetch upcoming appointments:", err);
+            }
+
+            try {
+                const notifRes = await axios.get("http://127.0.0.1:8000/notifications/", { headers });
+                setNotifications(notifRes.data.slice(0, 3));
+            } catch (err) {
+                console.error("❌ Failed to fetch notifications:", err);
+            }
+
+            try {
+                const dentistRes = await axios.get("http://127.0.0.1:8000/users/dentists/", { headers });
+                setDentists(dentistRes.data);
+            } catch (err) {
+                console.error("❌ Failed to fetch dentists:", err);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const getDentistName = (appointment) => {
+        if (!appointment || !appointment.dentist || !appointment.dentist.id) return "Unknown Dentist";
+
+        const match = dentists.find((doc) => doc.id === appointment.dentist.id);
+        if (match && match.user) {
+            const hasNames = match.user.first_name || match.user.last_name;
+            return hasNames ? `Dr. ${match.user.first_name || ""} ${match.user.last_name || ""}`.trim() : `Dr. ${match.user.username}`;
+        }
+
+        return `Dr. ${appointment.dentist.username || "Unknown"}`;
+    };
+
+    const getFormattedDate = (datetime) => {
+        const date = new Date(datetime);
+        return date.toLocaleDateString();
+    };
+
+    const getFormattedTime = (datetime) => {
+        const date = new Date(datetime);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
     return (
         <div className="page-container">
             <Sidebar activePage="dashboard" />
@@ -13,18 +72,31 @@ function Dashboard() {
                     {/* Upcoming Appointment */}
                     <div className="card">
                         <h2>Upcoming Appointment</h2>
-                        <div className="appointment-details">
-                            <img src="/profile-placeholder.jpg" alt="Dentist" className="profile-pic" />
-                            <p>You’ll be meeting with Dr. <b>Dentist Name</b> on <b>Date</b> at <b>Time</b>!</p>
-                            <p><b>Location:</b> Clinic Address</p>
-                            <a href="#" className="link">Reschedule your appointment</a>
-                        </div>
+                        {appointment ? (
+                            <div className="appointment-details">
+                                <p>
+                                    You’ll be meeting with <b>{getDentistName(appointment)}</b><br />
+                                    on <b>{getFormattedDate(appointment.appointment_date)}</b> at <b>{getFormattedTime(appointment.appointment_date)}</b>!
+                                </p>
+                                <p><b>Location:</b><br />6635 Flanders Dr. Suite E,<br />San Diego, CA 92121</p>
+                            </div>
+                        ) : (
+                            <p>No upcoming appointments found.</p>
+                        )}
                     </div>
 
                     {/* Notifications */}
                     <div className="card">
                         <h2>Notifications</h2>
-                        <p>You have no new notifications</p>
+                        {notifications.length > 0 ? (
+                            <div>
+                                {notifications.map((n, i) => (
+                                    <p key={i}><b>{n.notification_type}</b>: {n.message}</p>
+                                ))}
+                            </div>
+                        ) : (
+                            <p>You have no new notifications.</p>
+                        )}
                     </div>
 
                     {/* Quick Actions */}
