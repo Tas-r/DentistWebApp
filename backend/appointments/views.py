@@ -3,9 +3,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils import timezone
 from .models import Appointment, Services
-from .serializers import AppointmentSerializer, ServicesSerializer, SimpleDentistSerializer
+from .serializers import AppointmentSerializer, ServicesSerializer, SimpleDentistSerializer,AppointmentRescheduleSerializer
 from users.models import Patient, Dentist
 from notifications.models import Notification
+from django.shortcuts import get_object_or_404  # Add this import
 
 # Service List View (to display available services in the frontend)
 class ServiceListView(generics.ListAPIView):
@@ -161,3 +162,30 @@ class DentistListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Dentist.objects.all()
+    
+class AppointmentRescheduleView(generics.UpdateAPIView):
+    serializer_class = AppointmentRescheduleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.user_type == 'patient':
+            return Appointment.objects.filter(patient__user=user)
+        elif user.user_type == 'dentist':
+            return Appointment.objects.filter(dentist__user=user)
+        elif user.user_type == 'staff':
+            return Appointment.objects.all()
+        return Appointment.objects.none()
+
+    def perform_update(self, serializer):
+        appointment = serializer.save()
+        
+        # If the user is not a patient, create an additional notification
+        if self.request.user.user_type != 'patient':
+            Notification.objects.create(
+                user=appointment.patient.user,
+                notification_type='appointment_reminder',  # Changed from 'appointment_rescheduled' to match your choices
+                message=f"Your appointment with Dr. {appointment.dentist.user.username} has been rescheduled to {appointment.appointment_date.strftime('%Y-%m-%d %H:%M')} by {self.request.user.username}",
+                related_appointment=appointment,
+                is_read=False
+            )

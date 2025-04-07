@@ -22,4 +22,7 @@ urlpatterns = [
 
     # New path for fetching dentists
     path('dentists/', views.DentistListView.as_view(), name='dentist-list'),
+
+    #Path for recheduliong an appointment
+    path('<int:pk>/reschedule/', views.AppointmentRescheduleView.as_view(), name='appointment-reschedule'),
 ]

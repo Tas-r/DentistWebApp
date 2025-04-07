@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Appointment, Services
 from users.models import Patient, Dentist
 from django.contrib.auth import get_user_model
+from notifications.models import Notification
 
 User = get_user_model()
 
@@ -88,3 +89,29 @@ class SimpleDentistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dentist
         fields = ['id', 'first_name', 'last_name']
+
+
+class AppointmentRescheduleSerializer(serializers.ModelSerializer):
+    appointment_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+
+    class Meta:
+        model = Appointment
+        fields = ['id', 'appointment_date']
+        read_only_fields = ['id']
+
+    def update(self, instance, validated_data):
+        # Only update the appointment_date
+        instance.appointment_date = validated_data.get('appointment_date', instance.appointment_date)
+        instance.save()
+        
+        # Update or create notification using your Notification model
+        Notification.objects.filter(related_appointment=instance).delete()  # Remove old notification
+        Notification.objects.create(
+            user=instance.patient.user,
+            notification_type='appointment_reminder',
+            message=f"Your appointment with Dr. {instance.dentist.user.username} has been rescheduled to {instance.appointment_date.strftime('%Y-%m-%d %H:%M')}",
+            related_appointment=instance,
+            is_read=False
+        )
+        
+        return instance
