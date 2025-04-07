@@ -16,7 +16,8 @@ class DocumentListCreateView(generics.ListCreateAPIView):
         return Documents.objects.filter(user=self.request.user.patient_profile)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user.patient_profile)
+        # Remove the user argument here; the serializer handles it
+        serializer.save()
 
 class DocumentRetrieveDestroyView(generics.RetrieveDestroyAPIView):
     serializer_class = DocumentSerializer

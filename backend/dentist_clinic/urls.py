@@ -29,7 +29,7 @@ urlpatterns = [
     path('messaging/', include('messaging.urls')),
     path('medical_history/', include('medical_history.urls')),
     path('notifications/', include('notifications.urls')),
-    path('/documents/', include('documents.urls')),
+    path('documents/', include('documents.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
    
