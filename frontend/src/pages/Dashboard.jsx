@@ -31,6 +31,7 @@ function Dashboard() {
 
             try {
                 const dentistRes = await axios.get("http://127.0.0.1:8000/users/dentists/", { headers });
+                console.log("Fetched dentists:", dentistRes.data);
                 setDentists(dentistRes.data);
             } catch (err) {
                 console.error("❌ Failed to fetch dentists:", err);
