@@ -23,7 +23,7 @@ class MedicalHistoryViewSet(viewsets.ModelViewSet):
         - 'list' and 'retrieve': Any authenticated user (patients, dentists, staff).
         - 'create', 'update', 'partial_update', 'destroy': Only dentists or staff.
         """
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'my_history']:
             permission_classes = [permissions.IsAuthenticated]
         else:
             permission_classes = [permissions.IsAuthenticated, IsDentistOrStaff]
