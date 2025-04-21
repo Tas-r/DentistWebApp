@@ -4,7 +4,6 @@ from .models import Messaging
 from users.serializers import UserSerializer
 from users.models import User
 
-
 class MessageSerializer(serializers.ModelSerializer):
     sender = UserSerializer(read_only=True)
     recipient = UserSerializer(read_only=True)

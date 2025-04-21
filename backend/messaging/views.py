@@ -1,14 +1,13 @@
-from django.shortcuts import render
-
-# messaging/views.py
 from rest_framework import generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Messaging  # This line is causing the error
+from .models import Messaging
 from .serializers import MessageSerializer
 from django.db.models import Q
+import logging
 
-# Rest of your views code...
+# Set up logging
+logger = logging.getLogger(__name__)
 
 class MessageListCreateView(generics.ListCreateAPIView):
     """
@@ -47,8 +46,17 @@ class MessageDetailView(generics.RetrieveUpdateDestroyAPIView):
                 Q(sender=user) | Q(recipient=user)
             )
 
+    def get(self, request, *args, **kwargs):
+        # Mark the message as read when retrieved
+        instance = self.get_object()
+        logger.debug(f"Before marking as read: is_read={instance.is_read}, message_id={instance.id}")
+        instance.is_read = True
+        instance.save()
+        logger.debug(f"After marking as read: is_read={instance.is_read}, message_id={instance.id}")
+        return super().get(request, *args, **kwargs)
+
     def perform_update(self, serializer):
-        # Mark message as read when viewed
+        # Mark message as read when updated (e.g., via PATCH)
         serializer.save(is_read=True)
 
 class ReplyMessageView(generics.CreateAPIView):
